@@ -1,0 +1,58 @@
+================================================================================
+     CAPTCHA BOT DEMONSTRATION - DETAILED LOG (3 ATTACKS)
+================================================================================
+
+Test Started:  2025-11-26 15:07:05
+Test Ended:    2025-11-26 15:11:08
+CAPTCHA URL:   http://localhost:5001/
+
+================================================================================
+SUMMARY
+--------------------------------------------------------------------------------
+Attack #1: Simple Bot           ❌ BLOCKED
+Attack #2: Intermediate Bot     ❌ BLOCKED
+Attack #3: Advanced Bot         ✅ PASSED
+
+================================================================================
+
+ATTACK #1: Simple Bot
+--------------------------------------------------------------------------------
+Start Time: 2025-11-26 15:07:07
+Duration:   13.21 seconds
+Result:     ❌ BLOCKED
+Message:    Error: Alert Text: Verification failed: Invalid proof-of-work
+Message: unexpected alert open: {Alert text :
+
+================================================================================
+
+ATTACK #2: Intermediate Bot
+--------------------------------------------------------------------------------
+Start Time: 2025-11-26 15:07:24
+Duration:   11.23 seconds
+Result:     ❌ BLOCKED
+Message:    Error: Alert Text: Verification failed: High risk fingerprint: webdriver_detected, headless_browser (Risk: 
+
+================================================================================
+
+ATTACK #3: Advanced Bot
+--------------------------------------------------------------------------------
+Start Time: 2025-11-26 15:07:39
+Duration:   204.94 seconds
+Result:     ✅ SUCCESS
+Message:    ✅ CAPTCHA solved successfully! Recipient: Test User
+Amount: $100.00
+Status: Transfer initiated successfully
+
+================================================================================
+
+CONCLUSION
+--------------------------------------------------------------------------------
+This demonstration shows the progression of bot sophistication:
+
+Attack #1: Simple bots are easily detected by ML models
+Attack #2: Intermediate bots with basic humanization still fail
+Attack #3: Advanced bots with realistic behavior can bypass detection
+
+💡 Recommendation: Increase security level to MAXIMUM or add additional
+   detection layers to block advanced adversarial bots.
+================================================================================

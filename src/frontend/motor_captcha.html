@@ -1,0 +1,67 @@
+<!--Author: Krupaa -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Transfer - Verification</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Transfer Form Section -->
+    <div class="transfer-section" id="transferSection">
+        <h1>Secure Money Transfer</h1>
+        
+        <div class="form-group">
+            <label for="recipient">Recipient Name</label>
+            <input type="text" id="recipient" placeholder="Enter recipient name" value="">
+        </div>
+        
+        <div class="form-group">
+            <label for="amount">Amount (USD)</label>
+            <input type="number" id="amount" placeholder="0.00" value="" step="0.01">
+        </div>
+        
+        <button class="btn-primary" id="initiateBtn">Initiate Transfer</button>
+    </div>
+
+    <!-- Motor CAPTCHA Section -->
+    <div class="captcha-section motor-captcha-container" id="captchaSection" style="display: none;">
+        <h2>Please resolve the captcha</h2>
+        
+        <p class="instruction-text">Click the moving targets in the correct order shown below</p>
+        
+        <div class="target-sequence" id="targetSequence">Loading...</div>
+        
+        <div class="canvas-wrapper">
+            <canvas id="motorCanvas" width="700" height="350"></canvas>
+        </div>
+        
+        <p class="status-text" id="statusText">Get ready! Targets will appear shortly...</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <p class="targets-hit" id="targetsHit">Targets hit: 0 / 0</p>
+        
+        <div class="captcha-timer">
+            Time remaining: <span id="timer">30</span>s
+        </div>
+        
+        <button class="btn-secondary" id="cancelBtn">Cancel</button>
+    </div>
+
+    <!-- Success Section -->
+    <div class="success-section" id="successSection" style="display: none;">
+        <div class="success-icon">Transfer Successful</div>
+        <h2>Transfer Initiated Successfully</h2>
+        <div class="transfer-details" id="transferDetails"></div>
+        <button class="btn-primary" id="newTransferBtn">New Transfer</button>
+    </div>
+
+    <script src="pow.js"></script>
+    <script src="motor_captcha.js"></script>
+</body>
+</html>

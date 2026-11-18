@@ -1,0 +1,556 @@
+<!--Author: Krupaa -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced CAPTCHA Training Interface</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 4px solid #007bff;
+        }
+
+        .panel h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .training-area {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .training-area.active {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+
+        #trainingCanvas {
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            cursor: crosshair;
+            margin: 10px 0;
+        }
+
+        .log-area {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #007bff;
+            padding-left: 10px;
+        }
+
+        .log-entry.success {
+            border-color: #28a745;
+        }
+
+        .log-entry.error {
+            border-color: #dc3545;
+        }
+
+        .feature-importance {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .feature-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .feature-name {
+            min-width: 120px;
+            font-size: 0.9em;
+        }
+
+        .feature-progress {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .feature-progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .feature-value {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> Advanced CAPTCHA Training</h1>
+            <p>Collect training data and improve ML models for behavioral analysis</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Training Data Collection Panel -->
+            <div class="panel">
+                <h2><i class="fas fa-database"></i> Data Collection</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSamples">-</div>
+                        <div class="stat-label">Total Samples</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="humanSamples">-</div>
+                        <div class="stat-label">Human</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="botSamples">-</div>
+                        <div class="stat-label">Bot</div>
+                    </div>
+                </div>
+
+                <div class="training-area" id="trainingArea">
+                    <i class="fas fa-mouse-pointer" style="font-size: 3em; color: #007bff; margin-bottom: 15px;"></i>
+                    <h3>Click "Start Collection" then move your mouse naturally</h3>
+                    <p>We'll record your movement patterns for training</p>
+                    <canvas id="trainingCanvas" width="400" height="200" style="display: none;"></canvas>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="btn btn-success" id="startHumanBtn">
+                        <i class="fas fa-play"></i> Collect Human Data
+                    </button>
+                    <button class="btn btn-warning" id="startBotBtn">
+                        <i class="fas fa-robot"></i> Collect Bot Data
+                    </button>
+                    <button class="btn" id="stopBtn" disabled>
+                        <i class="fas fa-stop"></i> Stop Collection
+                    </button>
+                </div>
+            </div>
+
+            <!-- Model Training Panel -->
+            <div class="panel">
+                <h2><i class="fas fa-brain"></i> Model Training</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="featureCount">-</div>
+                        <div class="stat-label">Features</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="modelsTrained">No</div>
+                        <div class="stat-label">Trained</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn btn-success" id="trainBtn">
+                        <i class="fas fa-cogs"></i> Train Advanced Models
+                    </button>
+                    <button class="btn" id="testBtn">
+                        <i class="fas fa-test-tube"></i> Test Model
+                    </button>
+                    <button class="btn btn-danger" id="resetBtn">
+                        <i class="fas fa-trash"></i> Reset Data
+                    </button>
+                </div>
+
+                <div class="feature-importance" id="featureImportance">
+                    <h4>Feature Importance</h4>
+                    <p>Train a model to see feature importance</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Panel -->
+        <div style="padding: 0 30px 30px 30px;">
+            <div class="panel">
+                <h2><i class="fas fa-terminal"></i> Training Log</h2>
+                <div class="log-area" id="logArea">
+                    <div class="log-entry">System initialized. Ready for training data collection.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isCollecting = false;
+        let currentLabel = 1; // 1=human, 0=bot
+        let mouseEvents = [];
+        let targetSequence = [];
+        let canvas, ctx;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            canvas = document.getElementById('trainingCanvas');
+            ctx = canvas.getContext('2d');
+            
+            loadStats();
+            
+            // Event listeners
+            document.getElementById('startHumanBtn').addEventListener('click', () => startCollection(1));
+            document.getElementById('startBotBtn').addEventListener('click', () => startCollection(0));
+            document.getElementById('stopBtn').addEventListener('click', stopCollection);
+            document.getElementById('trainBtn').addEventListener('click', trainModels);
+            document.getElementById('testBtn').addEventListener('click', testModel);
+            document.getElementById('resetBtn').addEventListener('click', resetData);
+        });
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/training-stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalSamples').textContent = stats.total_samples;
+                document.getElementById('humanSamples').textContent = stats.human_samples;
+                document.getElementById('botSamples').textContent = stats.bot_samples;
+                document.getElementById('featureCount').textContent = stats.feature_count;
+                document.getElementById('modelsTrained').textContent = stats.models_trained ? 'Yes' : 'No';
+                
+            } catch (error) {
+                log('Error loading stats: ' + error.message, 'error');
+            }
+        }
+
+        function startCollection(label) {
+            currentLabel = label;
+            isCollecting = true;
+            mouseEvents = [];
+            
+            // Show canvas and setup targets
+            canvas.style.display = 'block';
+            setupTargets();
+            
+            // Update UI
+            document.getElementById('trainingArea').classList.add('active');
+            document.getElementById('startHumanBtn').disabled = true;
+            document.getElementById('startBotBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            
+            // Add event listeners
+            canvas.addEventListener('mousemove', recordMouseEvent);
+            canvas.addEventListener('mousedown', recordMouseEvent);
+            canvas.addEventListener('mouseup', recordMouseEvent);
+            
+            log(`Started collecting ${label === 1 ? 'human' : 'bot'} data...`);
+        }
+
+        function setupTargets() {
+            targetSequence = [
+                {x: 50, y: 50},
+                {x: 200, y: 150},
+                {x: 350, y: 100}
+            ];
+            
+            // Clear canvas and draw targets
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#007bff';
+            
+            targetSequence.forEach((target, index) => {
+                ctx.beginPath();
+                ctx.arc(target.x, target.y, 15, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(index + 1, target.x, target.y + 4);
+                ctx.fillStyle = '#007bff';
+            });
+        }
+
+        function recordMouseEvent(event) {
+            if (!isCollecting) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            mouseEvents.push({
+                x: x,
+                y: y,
+                t: Date.now(),
+                type: event.type,
+                pressure: event.pressure || 0.5
+            });
+            
+            // Visual feedback
+            if (event.type === 'mousemove') {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        async function stopCollection() {
+            if (!isCollecting) return;
+            
+            isCollecting = false;
+            
+            // Remove event listeners
+            canvas.removeEventListener('mousemove', recordMouseEvent);
+            canvas.removeEventListener('mousedown', recordMouseEvent);
+            canvas.removeEventListener('mouseup', recordMouseEvent);
+            
+            // Submit data
+            if (mouseEvents.length > 10) {
+                try {
+                    const response = await fetch('/collect-training-data', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            events: mouseEvents,
+                            targetSequence: targetSequence,
+                            canvasWidth: canvas.width,
+                            canvasHeight: canvas.height,
+                            label: currentLabel,
+                            metadata: {
+                                collection_time: new Date().toISOString(),
+                                event_count: mouseEvents.length
+                            }
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        log(`Collected sample with ${mouseEvents.length} events. Total: ${result.total_samples}`, 'success');
+                        loadStats();
+                    } else {
+                        log('Failed to collect sample', 'error');
+                    }
+                    
+                } catch (error) {
+                    log('Error submitting data: ' + error.message, 'error');
+                }
+            } else {
+                log('Not enough mouse events collected (need > 10)', 'error');
+            }
+            
+            // Reset UI
+            canvas.style.display = 'none';
+            document.getElementById('trainingArea').classList.remove('active');
+            document.getElementById('startHumanBtn').disabled = false;
+            document.getElementById('startBotBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        }
+
+        async function trainModels() {
+            log('Starting model training...');
+            document.getElementById('trainBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/train-advanced-model', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({})
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    log(`Models trained successfully with ${result.training_samples} samples!`, 'success');
+                    loadStats();
+                } else {
+                    log('Model training failed', 'error');
+                }
+                
+            } catch (error) {
+                log('Training error: ' + error.message, 'error');
+            }
+            
+            document.getElementById('trainBtn').disabled = false;
+        }
+
+        async function testModel() {
+            if (mouseEvents.length === 0) {
+                log('No mouse data to test. Collect some data first.', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/verify-advanced', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        events: mouseEvents,
+                        targetSequence: targetSequence,
+                        canvasWidth: canvas.width,
+                        canvasHeight: canvas.height
+                    })
+                });
+                
+                const result = await response.json();
+                
+                log(`Test Result: ${result.message} (${result.verified ? 'PASS' : 'FAIL'})`, 
+                    result.verified ? 'success' : 'error');
+                
+            } catch (error) {
+                log('Test error: ' + error.message, 'error');
+            }
+        }
+
+        async function resetData() {
+            if (confirm('Are you sure you want to reset all training data? This cannot be undone.')) {
+                log('Data reset functionality would be implemented here', 'error');
+                // TODO: Implement data reset endpoint
+            }
+        }
+
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+    </script>
+</body>
+</html>
